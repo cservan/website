@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0072)http://www-clips.imag.fr/geod/User/christophe.servan/tp4_traduction.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>TP 4 : Création d'un système de traduction probabiliste</title>
+<link href="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.css" rel="stylesheet" type="text/css"><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mutationObserver.js"></script><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.js"></script></head>
+<body>
+
+<center>
+  <h1>TP 4 : Création d'un système de traduction probabiliste</h1>
+  <h3 align="center">Christophe Servan (d'après Carlos Ramisch &amp; inspiré du <a href="http://www.statmt.org/moses/?n=Moses.Baseline">tutorial Moses</a>)</h3>
+</center>
+
+<!----------------------------------------------------------------------------->
+<hr>
+
+<p>Nous allons créer (apprendre) un système de traduction probabiliste minimal de manière complètement automatique à partir d'un corpus de traductions. L'objectif de cette séance de TP est d'arriver à obtenir, à la fin du TP, une traduction en français qui permettrait de déchiffrer (comprendre) un texte écrit dans une langue étrangère, ici l'anglais.</p>
+
+<p>La création d'un système de traduction à partir d'un corpus parallèle est un processus qui requiert beaucoup de ressources (processeur, mémoire). Même avec un petit corpus comme celui que nous allons utiliser, tout l'entraînement du système peut prendre plusieurs minutes, voire une à deux heures. Le système Moses fournit des outils optimisés pour réaliser cet entraînement, mais il contient quelques problèmes et/ou particularités à connaître. N'hésitez pas à vérifier manuellement le résultat de chaque étape ni à poser des questions si le lancement d'un script retourne une erreur.</p>
+<hr>
+<!----------------------------------------------------------------------------->
+
+<h2>Outils</h2>
+
+<ul>
+  <li>Les outils Moses et GIZA++ : disponibles ici : <tt>/home/s/servanc/Tools/{moses-smt/moses-2015-11-20,GIZA++}</tt> Si d'aventures vous souhaitez l'installer sur votre propre machine vous trouverez les binaires <a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/moses-2015-11-20.tar.gz">ici</a> pour moses et <a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/GIZA++.tar.gz">là</a> pour GIZA++ (aucune garantie de fonctionnement correct sous MacOS).</li> 
+  <li>L'outil SRILM : permet la création et utilisation de modèles de langage à n-grammes pour représenter et traiter des textes (déjà installé dans le TP2, sinon utilisez ce script pour le réinstaller : <a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/SRILM_installation.bash">SRILM_installation.bash</a>). </li>
+</ul>
+<h2>Données </h2>
+<ul>
+  <li>Des corpus parallèles d'aprentissage (où chaque phrase dans une langue source est alignée à une traduction en langue cible) pour entraîner les modèles de traduction (à télécharger <a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/data_tp4_translation.tgz">ici</a>) :</li>
+	<ul>
+	<li>Corpus anglais-français médical : European Medicines Agency (noté "EMEA_train")</li>
+	<li>Corpus anglais-français news : Europarl V7 (noté ep7_train)</li>
+	</ul>
+  <li>Des corpus de développement...:</li>
+        <ul>
+        <li>EMEA_dev</li>
+        <li>ep7_dev</li>
+        </ul>
+  <li>  ...et de test :</li>
+        <ul>
+        <li>EMEA_tst</li>
+        <li>ep7_tst</li>
+        </ul>        
+</ul>
+
+<hr>
+<!----------------------------------------------------------------------------->
+
+<!--<h2>Installation et configuration</h2>
+
+<p>Installation facile :</p>
+<ul>
+<li>Décompresser <a href="http://www-clips.imag.fr/geod/User/laurent.besacier/NEW-TPs/TP-CL2011/tools_tp5/tp5-tools.tar.gz">l'archive qui contient tous les outils</a> (disponible aussi sur clé USB) :
+<pre>tar xfz tp5-tools.tar.gz</pre>
+</li>
+<li>Appeler le script d'installation, en passant comme paramètre le répertoire contenant l'installation de SRILM, par exemple :
+<pre>
+./install.sh /home/ceramisch/CL/tools/srilm
+</pre>
+</li>
+<li>Attendre une dizaine de minutes...</li>
+</ul>
+<p>Installation avancée : <a href="#avance">documentation à la fin de l'énoncé</a></p>
+
+<hr/>-->
+<!----------------------------------------------------------------------------->
+        <h2>Rendu du TP 
+        </h2>
+        <p>TP à rendre avant le <b>08/03 avant 23h59</b> au format <b>PDF</b>
+        à l'adresse christophe_dot_servan_at_imag_dot_fr (remplacez les
+        _dot_ et _at_ par des points et arobases, respectivement) </p><p>
+        <em>Remarques :</em>
+        </p><ul>
+                <li>Si vous avez des difficultés, vous pouvez me contacter par mail, je vous répondrai dans les meilleurs délais.
+                </li><li>En cas de retard, des pénalités seront retenues sur la note.
+        </li></ul>
+        <p></p>
+        <hr>
+
+<h2>Travail à réaliser</h2>
+  <p>Dans ce TP vous allez devoir utiliser vos connaissances acquises lors du premier TP pour effectuer la segmentation (ou <em>tokenization</em> en anglais) des corpus puis vous allez créer les modèles de traductions (table de traduction + modèle de réordonnancement) et les modèles de langage.</p>
+<ol>
+
+
+  <h3>I. Tokenization</h3>
+    <p>Dans cette partie, vous allez préparer les corpus d'apprentissage, de développement et de test.<br>
+    Vous trouverez dans la partie script du répertoire contenant Moses, le répertoire tokenization qui contient le script <tt>tokenization.perl</tt>. 
+
+  </p><ol>
+
+    <p><strong>Exercice 1 :</strong> Utilisez le script pour segmenter tous les corpus</p>
+    <p><strong>Exercice 2 :</strong> Mettez-les tous les corpus en minuscule (<em>Remarque</em>: il existe également un script pour cela.) et renommez les corpus obtenus comme ceci <tt>ep7_train.tok.lc.fr</tt> (exemple donné pour la sortie du traitement de <tt>ep7_train.fr</tt>) .</p>
+
+
+  </ol>
+  <h3>II. Modèle de Langage</h3>
+    <p>Vous allez réutiliser l'outil SRILM pour créer des modèles de langage dans la langue cible de traduction</p>
+
+  <ol>
+
+    <p><strong>Exercice 1 :</strong> concaténez l'ensemble des corpus d'apprentissage français segmentés et mis en minuscule en un seul corpus</p>
+    <p><strong>Exercice 2 :</strong> À l'aide de SRILM, créer un modèle de langage d'ordre 3 et sauvegardez-le au format binaire à partir du corpus concaténé. Placer ce modèle dans un répertoire appelé <tt>lm</tt>. </p><!--Une fois le modèle créé, le convertir en format binaire à l'aide de la commande <tt>build_binary</tt> de Moses.</p>-->
+
+  </ol>
+  <h3>III. Modèle de Traduction</h3>
+
+    <p>Les opérations qui suivent risquent de prendre du temps, n'hésitez pas à prendre une sous-partie du corpus d'apprentissage pour tester vos commandes.</p>
+  <ol>
+    <p><strong>Exercice 1 :</strong> </p><p>Paramétrez la variable d'environnement MOSESDIR à l'emplacement suivant : <tt>/home/s/servanc/Tools/moses-smt/moses-2015-11-20/</tt> et GIZADIR à <tt>/home/s/servanc/Tools/GIZA++/</tt> et lancez la commande suivante en remplaçant "MONLM" par le nom de fichier de votre modèle de langage :</p>
+    <pre>    $MOSESDIR/scripts-moses/training/train-model.perl -debug \
+              -first-step 1 \
+              -scripts-root-dir $MOSESDIR/scripts-moses/ \
+              -external-bin-dir $GIZADIR \
+              -root-dir EMEA_train_model/ -model-dir EMEA_train_model/model \
+              -corpus data_translation/EMEA_train.tok.lc -f en -e fr \
+              -alignment grow-diag-final-and -reordering msd-bidirectional-fe \
+              -mgiza -mgiza-cpus=2 -parallel -lm 0:3:lm/MONLM:0 -sort-buffer-size 4G 
+    </pre>
+    <ul>
+    <li><strong>Q1 :</strong> Inspecter les répertoires <tt>giza.en-fr</tt> et <tt>giza.fr-en</tt>. Que contiennent-ils ?</li>
+    <li><strong>Q2 :</strong> Dans le répertoire <tt>model</tt>, le fichier <tt>phrase-table.gz</tt> contient la table de traduction. À l'aide de la commande <tt>gunzip -c phrase-table.gz &gt; phrase-table</tt>, décompressez et décrivez le contenu de ce fichier.</li>
+    <li><strong>Q3 :</strong> Dans ce même répertoire, les fichiers <tt>lex.e2f</tt> et <tt>lex.f2e</tt> contiennent les probabilités lexicales. À l'aide de la commande <tt>grep</tt>, recherchez quelles sont les traductions possibles pour le mot français "examiner"</li>
+    </ul>
+
+    <p><strong>Exercice 2 :</strong>Essayez de traduire les premières trois phrase de votre fichier à déchiffrer avec ce système, par exemple : </p>
+
+    <pre>    head -n 3 EMEA_tst.en | $MOSESDIR/bin/moses -f model/moses.ini
+    </pre>
+
+    <ul>
+    <li><strong>Q1 :</strong> Quelles sont les traductions en français obtenues ? Sont-elles compréhensibles ? Pourquoi ?</li>
+    <li><strong>Q2 :</strong> Ouvrez le fichier <tt>model/moses.ini</tt>. Quelles sont les informations qu'il contient ? Que représentent les informations de type <tt>weight</tt> ?</li>
+    </ul>
+
+    <p><strong>Exercice 3 :</strong> Relancez l'apprentissage avec le corpus <tt>ep7_train</tt>. Attention de ne pas écraser les répertoires déjà existant !!! </p>
+    <ul>
+    <li><strong>Q1 :</strong> Inspecter le nouveau répertoire <tt>model</tt>. Est-il différent du précédent ?</li>
+    <li><strong>Q2 :</strong> Dans ce même répertoire, les fichiers <tt>lex.e2f</tt> et <tt>lex.f2e</tt> contiennent les probabilités lexicales. À l'aide de la commande <tt>grep</tt>, recherchez quelles sont les traductions possibles pour le mot "examiner" et comparez les résultats avec ceus de l'exercice 1.</li>
+    </ul>
+
+</ol>
+<h3>IV. Optimisation des poids de paramètres</h3>
+    <p> Grâce à l'algorithme MERT (Minimum Error Rate Training) vous allez pouvoir optimiser les poinds des paramètres de votre système.</p>
+
+<ol>
+    <p><strong>Exercice 1 :</strong> </p><p> Lancez la commande suivante :</p>
+    <pre>    $MOSESDIR/scripts-moses/training/mert-moses.pl --working-dir `pwd`/tuning \
+    data_translation/EMEA_dev.en data_translation/EMEA_dev.fr $MOSESDIR/bin/moses model/moses.ini --rootdir $MOSESDIR/scripts-moses/ --closest --nbest 100
+    </pre>
+
+    <ul>
+    <li><strong>Q1 :</strong> Quelle est la différence entre <tt>model/moses.ini</tt> et <tt>tuning/moses.ini</tt> ? Comment pourrait-on l'expliquer ?</li>
+    </ul>
+    <br>
+    <em>Remarque : </em> Attention, ce processus prend plusieurs minutes voire quelques dizaines de minutes. Vous pouvez essayer votre commande en limitant le nombre d'itérations à 1 avec l'option <tt>--maximum-iterations</tt>.
+    <p><strong>Exercice 2 :</strong> </p><p> Lancez l'optimisation avec le corpus ep7_dev sans écraser la précédente optimisation</p>
+    <ul>
+    <li><strong>Q1 :</strong> Quelle est la différence entre les deux <tt>moses.ini</tt> obtenus après le processus ? Comment pourrait-on l'expliquer ?</li>
+    </ul>
+
+    <p><strong>Exercice 3 :</strong> Répétez les exercices précédents avec le modèle <tt>ep7_train</tt>.</p>
+</ol>
+<h3>V. Evaluation de la traduction</h3>
+<ol>
+
+    <p><strong>Exercice 1 :</strong> Traduire la totalité du fichier <tt>EMEA_tst.en</tt> . Filtrer le modèle afin que la table de traduction puisse être chargée en mémoire. Ensuite, calculer la qualité de cette traduction par rapport à la traduction de référence (<tt>EMEA_tst.fr</tt>).</p>
+
+    <pre>    mkdir -p eval/
+    $MOSESDIR/scripts/training/filter-model-given-input.pl EMEA_train_model/eval/filtered EMEA_train_model/tuning/moses.ini data_translation/EMEA_tst.en
+    $MOSESDIR/bin/moses -f eval/filtered/moses.ini &lt; data_translation/EMEA_tst.en &gt; EMEA_train_model/eval/EMEA_tst.fr
+    $MOSESDIR/scripts/generic/multi-bleu.perl -lc data_translation/EMEA_tst.fr &lt; EMEA_train_model/eval/EMEA_tst.fr
+    </pre>
+
+    <ul>
+    <li><strong>Q1 :</strong> Est-ce que, avec la traduction automatique, on peut comprendre le sens du texte traduit automatiquement ? </li>
+    <li><strong>Q2 :</strong> Quel est le score BLEU obtenu par votre système ? Il est meilleur ou pire que celui obtenu par les autres binômes ? Pourquoi ?</li>
+    </ul>
+
+    <p><strong>Exercice 2 :</strong> Traduire la totalité du fichier <tt>ep7_tst.en</tt>. Même questions.
+
+    </p><p><strong>Exercice 3 :</strong> Traduire la totalité du fichier <tt>ep7_tst.en</tt> avec la seconde optimisation. Même questions.
+    </p><ul>
+    <li><strong>Q3 :</strong> Que pouvez-vous dire de l'optimisation ? </li>
+    <li><strong>Q4 :</strong> Suggérez des améliorations possibles au système de traduction que vous venez de créer.</li>
+    </ul>
+
+    <p><strong>Exercice 4 :</strong> Répétez les exercices précédents avec le modèle <tt>ep7_train</tt>. Qu'en concluez-vous ? </p>
+
+</ol>
+<h3>VI. Bonus (optionnel)</h3>
+<p>Relancez l'ensemble de l'apprentissage (modèle de traduction et modèle de langage) et de l'optimisation avec la concaténation de tous les corpus d'apprentissage, optimisez le tout avec le corpus <tt>ep7_dev</tt> puis évaluez à nouveau ep7_tst. Qu'en concluez-vous ?</p>
+<p><em>Remarque : </em> Le bonus ne sera pris en compte uniquement si toutes les parties précédentes ont été faites.</p>
+<ol>
+</ol>
+</ol>
+<hr>
+Fin du TP.
+<!--TO CONTINUE...
+
+
+<p><em>Dans les exercices qui suivent, la langue étrangère choisie sera représentée par LANG2. Remplacer LANG2 par le code à deux lettres (bg, cs, fi, hu, ro) de la langue du texte à déchiffrer</em></p>
+
+<p><strong>Exercice 1 :</strong> Choisir et télécharger un corpus parallèle de la liste (selon la langue du texte que vous avez choisi de traduire). Décompresser et regarder les contenus du corpus dans un répertoire appelé <tt>LANG2-fr</tt>.</p>
+
+<ul>
+<li><strong>Q1 :</strong> Que contiennent les fichiers <tt>train.fr</tt> et <tt>train.LANG2</tt> ?</li>
+</ul>
+
+<p><strong>Exercice 2 :</strong> À l'aide de SRILM, créer un modèle de langage d'ordre 3 pour le corpus train.fr. Placer ce modèle dans un répertoire appelé <tt>lm</tt>. </p><!--Une fois le modèle créé, le convertir en format binaire à l'aide de la commande <tt>build_binary</tt> de Moses.</p>
+
+<pre>
+mkdir lm
+ngram-count -lm lm/fr.lm -text LANG2-fr/train.fr -order 3
+</pre> <!--$MOSESDIR/bin/build_binary lm/fr.lm lm/fr.blm
+
+<ul>
+<li><strong>Q1 :</strong> Expliquez avec vos propres mots comment on utilise ce modèle de langage dans le système de traduction probabiliste</li>
+<li><strong>Q2 :</strong> Pourquoi construit-on un modèle pour la langue cible (français) et non pas pour la langue source (LANG2) ?</li>
+</ul>
+
+<p><strong>Exercice 3 :</strong> Lancer l'alignement lexical et l'extraction de la table de traduction, à l'aide de la commande suivante (peut prendre plusieurs minutes) :</p>
+<pre>
+$MOSESDIR/scripts/training/train-model.perl -parallel \
+-root-dir . -corpus LANG2-fr/train -f LANG2 -e fr \
+-alignment grow-diag-final-and -reordering msd-bidirectional-fe \
+-lm 0:3:`pwd`/lm/fr.lm:0 -external-bin-dir $MOSESDIR/tools
+</pre>
+
+<ul>
+<li><strong>Q1 :</strong> Inspecter les répertoires <tt>giza.LANG2-fr</tt> et <tt>giza.fr-LANG2</tt>. Que contiennent-ils ?</li>
+<li><strong>Q2 :</strong> Dans le répertoire <tt>model</tt>, le fichier <tt>phrase-table.gz</tt> contient la table de traduction. À l'aide de la commande <tt>gunzip -c phrase-table.gz > phrase-table</tt>, décompressez et décrivez le contenu de ce fichier.</li>
+</ul>
+
+<p><strong>Exercice 4 :</strong>Essayez de traduire les premières trois phrase de votre fichier à déchiffrer avec ce système, par exemple : </p>
+
+<pre>
+head -n 3 src.LANG2 | $MOSESDIR/bin/moses -f model/moses.ini
+</pre>
+
+<ul>
+<li><strong>Q1 :</strong> Quelles sont les traductions en français obtenues ? Sont-elles compréhensibles ? Pourquoi ?</li>
+<li><strong>Q2 :</strong> Ouvrez le fichier <tt>model/moses.ini</tt>. Quelles sont les informations qu'il contient ? Que représentent les informations de type <tt>weight</tt> ?</li>
+</ul>
+
+<p><strong>Exercice 5 :</strong>Optimisez les poids de chaque attribut à l'aide d'une itération de MERT (peut prendre plusieurs minutes) :</p>
+
+<pre>
+$MOSESDIR/scripts/training/mert-moses.pl --working-dir `pwd`/tuning \
+LANG2-fr/dev.LANG2 LANG2-fr/dev.fr $MOSESDIR/bin/moses model/moses.ini \
+--maximum-iterations=1
+</pre>
+
+<ul>
+<li><strong>Q1 :</strong> Quelle est la différene entre <tt>model/moses.ini</tt> et <tt>tuning/moses.ini</tt> ? Comment pourrait-on l'expliquer ?</li>
+</ul>
+
+<p><strong>Exercice 6 :</strong> : Traduire la totalité du fichier <tt>src.LANG2</tt>. Filtrer le modèle afin que la table de traduction puisse être chargée en mémoire. Ensuite, calculer la qualité de cette traduction par rapport à la traduction de référence (demander le fichier <tt>src.fr</tt> à l'enseignant)</a>.</p>
+
+<pre>
+$MOSESDIR/scripts/training/filter-model-given-input.pl filtered tuning/moses.ini src.LANG2
+$MOSESDIR/bin/moses -f filtered/moses.ini < src.LANG2 > trad.fr
+$MOSESDIR/scripts/generic/multi-bleu.perl -lc src.fr < trad.fr
+</pre>
+
+<ul>
+<li><strong>Q1 :</strong> Est-ce que, avec la traduction automatique, on peut comprendre le sens du texte chiffré ? De quel célèbre texte s'agit-t-il ?</li>
+<li><strong>Q2 :</strong> Quel est le score BLEU obtenu par votre système ? Il est meilleur ou pire que celui obtenu par les autres binômes ? Pourquoi ?</li>
+<li><strong>Q3 :</strong> Suggérez des améliorations possibles au système de traduction que vous venez de créer.</li>
+</ul>
+
+</ol>
+Fin du TP.-->
+
+<!--<hr/>
+
+<h2><a id="avance">Installation et configuration avancées</a></h2>
+
+<ol>
+<li>Téléchargez et installez la bibliothèque Boost, un pré-requis de Moses:
+<ul>
+<li>Si vous êtes sur Debian, Ubuntu, Mint, etc, et que vous avez les privilèges nécessaires pour installer un logiciel sur l'ordinateur, il suffit de taper :
+<pre>
+sudo apt-get install libboost-all-dev
+</pre>
+</li>
+<li>Sinon, il faut <a href="https://sourceforge.net/projects/boost/files/boost/1.53.0/boost_1_53_0.tar.gz">télécharger</a> et installer la bibliothèque manuellement à l'aide des commandes suivantes :
+<pre>
+tar xfz boost_1_53_0.tar.gz
+cd boost_1_53_0
+./bootstrap.sh --prefix=`pwd` \
+--with-libraries=system,thread,iostreams,test,program_options
+NO_BZIP2=1 ./b2 -q install
+cd ..
+</pre></li>
+</ul>
+<li>Téléchargez (ou copiez à partir d'une clé USB) les <a href="http://www-clips.imag.fr/geod/User/laurent.besacier/NEW-TPs/TP-CL2011/tools_tp5/tp5-tools.tar.gz">outils Moses et GIZA++ fournis</a></li>
+</li>
+<li>Décompressez le fichier à l'aide de la commande 
+<pre>
+tar xfz tp5-tools.tar.gz
+</pre>
+</li>
+<li>Compilez l'outil d'alignement lexical GIZA++ à l'aide des commandes suivantes (peut prendre quelques minutes):
+<pre>
+cd giza-pp
+make
+cd ..
+</pre>
+</li>
+
+<li>Compilez le système de traduction automatique Moses (peut prendre quelques minutes). Pour cela, vous aurez besoin de deux informations supplémentaires :
+<ul>
+  <li>Le nombre de processeurs de votre ordinateur, qui sera donné en paramètre de l'option <tt>-j</tt> (dans l'exemple, il s'agit d'un ordinateur avec 8 coeurs). Si vous ne la connaissez pas, cette information peut être trouvée à l'aide de la commande <tt>cat /proc/cpuinfo</tt></li>
+  <li>Le chemin complet vers le répertoire où SRI-LM est installé, qui sera donné en paramètre de l'option <tt>--with-srilm=</tt> (dans l'exemple, c'est le répertoire <tt>/home/ceramisch/CL/tools/srilm</tt>)</li>
+</ul>
+<pre>
+cd $MOSESDIR
+./bjam -q -j8 --with-srilm=/home/ceramisch/CL/tools/srilm
+cd ..
+</pre>
+<p><strong>Remarque : </strong> Si à l'étape 1 vous avez choisi l'installation manuelle de Boost, vous devez également rajouter le paramètre <tt>--with-boost=/home/ceramisch/CL/tools/boost_1_53_0</tt>, en changeant le chemin selon l'endroit où vous avez téléchargé et décompressé Boost. Si vous avez utilisé le package Debian, il n'y a rien à rajouter, la bibliothèque sera trouvée automatiquement</p>
+</li>
+</ol>-->
+
+
+<mytubeelement id="myTubeRelayElementToPage" event="preferencesUpdated" data="{&quot;bundle&quot;:{&quot;label_delimitor&quot;:&quot;:&quot;,&quot;percentage&quot;:&quot;%&quot;,&quot;smart_buffer&quot;:&quot;Smart Buffer&quot;,&quot;start_playing_when_buffered&quot;:&quot;Start playing when buffered&quot;,&quot;sound&quot;:&quot;Sound&quot;,&quot;desktop_notification&quot;:&quot;Desktop Notification&quot;,&quot;continuation_on_next_line&quot;:&quot;-&quot;,&quot;loop&quot;:&quot;Loop&quot;,&quot;only_notify&quot;:&quot;Only Notify&quot;,&quot;estimated_time&quot;:&quot;Estimated Time&quot;,&quot;global_preferences&quot;:&quot;Global Preferences&quot;,&quot;no_notification_supported_on_your_browser&quot;:&quot;No notification style supported on your browser version&quot;,&quot;video_buffered&quot;:&quot;Video Buffered&quot;,&quot;buffered&quot;:&quot;Buffered&quot;,&quot;hyphen&quot;:&quot;-&quot;,&quot;buffered_message&quot;:&quot;The video has been buffered as requested and is ready to play.&quot;,&quot;not_supported&quot;:&quot;Not Supported&quot;,&quot;on&quot;:&quot;On&quot;,&quot;off&quot;:&quot;Off&quot;,&quot;click_to_enable_for_this_site&quot;:&quot;Click to enable for this site&quot;,&quot;desktop_notification_denied&quot;:&quot;You have denied permission for desktop notification for this site&quot;,&quot;notification_status_delimitor&quot;:&quot;;&quot;,&quot;error&quot;:&quot;Error&quot;,&quot;adblock_interferance_message&quot;:&quot;Adblock (or similar extension) is known to interfere with SmartVideo. Please add this url to adblock whitelist.&quot;,&quot;calculating&quot;:&quot;Calculating&quot;,&quot;waiting&quot;:&quot;Waiting&quot;,&quot;will_start_buffering_when_initialized&quot;:&quot;Will start buffering when initialized&quot;,&quot;will_start_playing_when_initialized&quot;:&quot;Will start playing when initialized&quot;,&quot;completed&quot;:&quot;Completed&quot;,&quot;buffering_stalled&quot;:&quot;Buffering is stalled. Will stop.&quot;,&quot;stopped&quot;:&quot;Stopped&quot;,&quot;hr&quot;:&quot;Hr&quot;,&quot;min&quot;:&quot;Min&quot;,&quot;sec&quot;:&quot;Sec&quot;,&quot;any_moment&quot;:&quot;Any Moment&quot;,&quot;popup_donate_to&quot;:&quot;Donate to&quot;,&quot;extension_id&quot;:&quot;lnkdbjbjpnpjeciipoaflmpcddinpjjp&quot;},&quot;prefs&quot;:{&quot;desktopNotification&quot;:true,&quot;soundNotification&quot;:true,&quot;logLevel&quot;:0,&quot;enable&quot;:true,&quot;loop&quot;:false,&quot;hidePopup&quot;:false,&quot;autoPlay&quot;:false,&quot;autoBuffer&quot;:false,&quot;autoPlayOnBuffer&quot;:false,&quot;autoPlayOnBufferPercentage&quot;:42,&quot;autoPlayOnSmartBuffer&quot;:true,&quot;quality&quot;:&quot;default&quot;,&quot;fshd&quot;:false,&quot;onlyNotification&quot;:false,&quot;enableFullScreen&quot;:true,&quot;saveBandwidth&quot;:false,&quot;hideAnnotations&quot;:false,&quot;turnOffPagedBuffering&quot;:false}}"></mytubeelement><mytubeelement id="myTubeRelayElementToTab" event="relayPrefs" data="{&quot;loadBundle&quot;:true}"></mytubeelement></body></html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0083)http://www-clips.imag.fr/geod/User/christophe.servan/tp2_identification_langue.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>TP 2 : Reconnaissance Automatique de la Langue d'un Texte à l'Aide de Modèles de Langage Statistiques</title>
+<link href="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.css" rel="stylesheet" type="text/css"><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mutationObserver.js"></script><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.js"></script></head>
+<body>
+
+<center>
+  <h1>TP 2 : Reconnaissance Automatique de la Langue d'un Texte<br>
+   à l'Aide de Modèles de Langage Statistiques</h1>
+  <h3>Christophe Servan d'après les TPs de Laurent Besacier (adapté par Carlos Ramisch)</h3>
+</center>
+
+<!----------------------------------------------------------------------------->
+<hr>
+
+<h2>Outils</h2>
+
+<ul>
+  <li>L'outil SRI-LM : permet la création et utilisation de modèles de langage à n-grammes pour représenter et traiter des textes</li>
+    <ul>
+      <li> Télécharger l'archive (tar.gz) de SRILM <a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/srilm-1.6.0.tar.gz">ici</a> </li>
+      <li> Décompresser, paramétrez la variable d'environnement <tt>SRILM</tt> en y mettant le répertoire courant du <tt>Makefile</tt>, puis installer avec la commande <tt>make World  MACHINE_TYPE=i686-m64 </tt> pour les MacOS utilisez cette ligne de commande :  <tt>make World  MACHINE_TYPE=macosx-m64 </tt>  (ou suivre les instructions dans le fichier <tt>INSTALL</tt>)</li>
+      <li> Une documentation détaillée pour l'installation d'anciennes versions ou sur des plate-formes non standard se trouve <a href="http://www-clips.imag.fr/geod/User/laurent.besacier/NEW-TPs/TP-Parole/TPsri-lm/materiel/install-srilm.txt">ici</a></li>
+      <li>La documentation de l'outil se trouve <a href="http://www.speech.sri.com/projects/srilm/manpages/">en ligne</a> ou sous forme de page <tt>man</tt> sur la ligne de commande (rajouter le répertoire à la variable d'environnement <tt>MANPATH</tt>)</li>
+    </ul>
+  <li>Deux textes de taille équivalente en deux langues différentes</li>
+	<ul>
+	<li>Utiliser les <a href="http://www-clips.imag.fr/geod/User/laurent.besacier/NEW-TPs/TP-CL2011/tools_tp3">fichiers fournis</a>, OU</li>
+	<li>Choisir des textes au hasard sur le web → faire attention à la séparation des phrases, aux majuscules et à la tokenisation.
+	</li></ul>  
+</ul>
+
+<hr>
+<h2> Rendu du TP </h2>
+<p>TP à rendre avant le <b>16/02 avant 23h59</b> au format <b>PDF</b> à l'adresse christophe_dot_servan_at_imag_dot_fr (remplacez les _dot_ et _at_ par des points et arobases, respectivement) </p>
+<hr>
+<!----------------------------------------------------------------------------->
+
+<h2>Travail à réaliser</h2>
+
+<p><strong>Exercice 1 :</strong> Couper chaque fichier de chaque langue en deux parties contenant un nombre de lignes égal (par exemple, on coupe le fichier <tt>fr.txt</tt> en un fichier <tt>train.fr</tt> et un fichier <tt>test.fr</tt>)</p>
+
+<ul>
+<li><strong>Q1 :</strong> Pourquoi doit-on utiliser des textes différents pour l'apprentissage et le test ?</li>
+</ul>
+
+<p><em>Rappel du TP 1</em> : La commande linux <tt>wc</tt> donne le nombre de lignes d'un fichier texte ; la commande <tt>head</tt> (ou <tt>tail</tt>) permet de recupérer les n premières (ou dernières) lignes d'un fichier.</p>
+
+
+<p><strong>Exercice 2 :</strong> Construire un modèle de langage à trigrammes pour chaque fichier d'apprentissage créé précédemment en utilisant les commandes suivantes :</p>
+
+<pre>ngram-count -order 3 -text train.fr -write fr3g.bo -write-vocab fr.voc
+ngram-count&nbsp;-read fr3g.bo -lm fr3g.BO -gt2min 1 -gt3min 2
+</pre>
+
+<ul>
+<li><strong>Q1 :</strong> Observez les fichiers <tt>.voc</tt> , <tt>.bo</tt> et <tt>.BO</tt> ; que contiennent ils ?</li>
+<li><strong>Q2 :</strong> À votre avis, à quoi correspondent les symboles &lt;s&gt; et &lt;/s&gt; ?</li>
+<li><strong>Q3 :</strong> À quoi servent les options <tt>-gt2min</tt> et <tt>-gt3min</tt> ? Dans quels cas elles sont utiles/nécessaires ? </li>
+<li><strong>Q4 :</strong> Quel est le trigramme le plus fréquent dans chacune des langues ?</li>
+</ul>
+
+<p><em>Remarque : </em> La première colonne du fichier <tt>.BO</tt> est homogène au logarithme d'une probabilité.</p>
+<p><em>Aide :</em> La commande unix <tt>sort -n</tt> permet de trier un fichier en fonction d'un de ses champs présent sous forme numérique.</p>
+
+<p><strong>Exercice 3 :</strong> Calculer la perplexité de chaque texte <tt>test.LANG</tt> par rapport à chaque modèle <tt>LANG3g.BO</tt>. Exemple d'utilisation de la commande ngram : </p>
+<pre>ngram -lm fr3g.BO -ppl test.en
+</pre>
+
+<ul>
+<li><strong>Q1 :</strong> Présenter les résultats sous forme de matrice.</li>
+<li><strong>Q2 :</strong>Comment peut-on construire un système de reconnaissance de la langue d'un texte en utilisant un modèle de langage stochastique ?<p></p>
+</li></ul>
+
+<p><strong>Exercice 4 :</strong> Refaire le meme système avec des modèles n-grammes de CARACTÈRES.</p>
+
+<ul>
+<li><strong>Q1 :</strong> Quelles sont les perplexités pour ce modèle de caractères ? Quels pourraient être les avantages/inconvenients du modèle de caractères par rapport au modèle de mots ?</li>
+<li><strong>Q2 :</strong> Refaire le modèle en remplaçant l'espace par un symbole quelconque (p. ex., &lt;SPACE&gt;). Quelles sont les perplexités pour ce modèle ?</li>
+</ul>
+
+<p><em>Aide :</em> Un modèle peut être considéré plus performant qu'un autre si, pour un texte de la même langue, la perplexité est inférieure et, pour un texte dans une autre langue, la perplexité est supérieure.</p>
+
+<hr>
+<!----------------------------------------------------------------------------->
+
+<h2>Extensions</h2>
+
+<ul>
+<li> Étendre la matrice de perpléxités pour toutes les autres langues. Vérifier quelles sont les paires de langues les plus faciles/difficiles à distinguer les unes des autres.</li>
+<li>Construire des modèles de différents ordres (paramètre <tt>order</tt>) et vérifier lequel est plus efficace dans la détection de la langue</li>
+<li>Étudier l'influence de la taille du fichier d'apprentissage dans la performance du système. Montrer graphiquement l'impact sur les perplexités pour plusieurs tailles de fichier d'apprentissage.</li>
+<li>Répondre à la question : quelle est la taille du plus petit fichier de test pour lequel l'identification peut être effectuée avec ces modèles ? Par exemple, est-ce que avec un fichier contenant seulement une phrase l'identification est possible ? Et un seul mot ? Et un seul caractère ?</li>
+<li>Faire varier la valeur des paramètres <tt>gt2min</tt> et <tt>gt3min</tt> : quelle est l'influence de ces paramètres sur les perplexités calculées ?</li>
+</ul>
+
+
+
+<mytubeelement id="myTubeRelayElementToPage" event="preferencesUpdated" data="{&quot;bundle&quot;:{&quot;label_delimitor&quot;:&quot;:&quot;,&quot;percentage&quot;:&quot;%&quot;,&quot;smart_buffer&quot;:&quot;Smart Buffer&quot;,&quot;start_playing_when_buffered&quot;:&quot;Start playing when buffered&quot;,&quot;sound&quot;:&quot;Sound&quot;,&quot;desktop_notification&quot;:&quot;Desktop Notification&quot;,&quot;continuation_on_next_line&quot;:&quot;-&quot;,&quot;loop&quot;:&quot;Loop&quot;,&quot;only_notify&quot;:&quot;Only Notify&quot;,&quot;estimated_time&quot;:&quot;Estimated Time&quot;,&quot;global_preferences&quot;:&quot;Global Preferences&quot;,&quot;no_notification_supported_on_your_browser&quot;:&quot;No notification style supported on your browser version&quot;,&quot;video_buffered&quot;:&quot;Video Buffered&quot;,&quot;buffered&quot;:&quot;Buffered&quot;,&quot;hyphen&quot;:&quot;-&quot;,&quot;buffered_message&quot;:&quot;The video has been buffered as requested and is ready to play.&quot;,&quot;not_supported&quot;:&quot;Not Supported&quot;,&quot;on&quot;:&quot;On&quot;,&quot;off&quot;:&quot;Off&quot;,&quot;click_to_enable_for_this_site&quot;:&quot;Click to enable for this site&quot;,&quot;desktop_notification_denied&quot;:&quot;You have denied permission for desktop notification for this site&quot;,&quot;notification_status_delimitor&quot;:&quot;;&quot;,&quot;error&quot;:&quot;Error&quot;,&quot;adblock_interferance_message&quot;:&quot;Adblock (or similar extension) is known to interfere with SmartVideo. Please add this url to adblock whitelist.&quot;,&quot;calculating&quot;:&quot;Calculating&quot;,&quot;waiting&quot;:&quot;Waiting&quot;,&quot;will_start_buffering_when_initialized&quot;:&quot;Will start buffering when initialized&quot;,&quot;will_start_playing_when_initialized&quot;:&quot;Will start playing when initialized&quot;,&quot;completed&quot;:&quot;Completed&quot;,&quot;buffering_stalled&quot;:&quot;Buffering is stalled. Will stop.&quot;,&quot;stopped&quot;:&quot;Stopped&quot;,&quot;hr&quot;:&quot;Hr&quot;,&quot;min&quot;:&quot;Min&quot;,&quot;sec&quot;:&quot;Sec&quot;,&quot;any_moment&quot;:&quot;Any Moment&quot;,&quot;popup_donate_to&quot;:&quot;Donate to&quot;,&quot;extension_id&quot;:&quot;lnkdbjbjpnpjeciipoaflmpcddinpjjp&quot;},&quot;prefs&quot;:{&quot;desktopNotification&quot;:true,&quot;soundNotification&quot;:true,&quot;logLevel&quot;:0,&quot;enable&quot;:true,&quot;loop&quot;:false,&quot;hidePopup&quot;:false,&quot;autoPlay&quot;:false,&quot;autoBuffer&quot;:false,&quot;autoPlayOnBuffer&quot;:false,&quot;autoPlayOnBufferPercentage&quot;:42,&quot;autoPlayOnSmartBuffer&quot;:true,&quot;quality&quot;:&quot;default&quot;,&quot;fshd&quot;:false,&quot;onlyNotification&quot;:false,&quot;enableFullScreen&quot;:true,&quot;saveBandwidth&quot;:false,&quot;hideAnnotations&quot;:false,&quot;turnOffPagedBuffering&quot;:false}}"></mytubeelement><mytubeelement id="myTubeRelayElementToTab" event="relayPrefs" data="{&quot;loadBundle&quot;:true}"></mytubeelement></body></html>

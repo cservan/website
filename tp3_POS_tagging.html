@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0073)http://www-clips.imag.fr/geod/User/christophe.servan/tp3_POS_tagging.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title>TP 3 : TP Introduction aux automates à états finis : application à l'analyse syntaxique</title>
+<link href="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.css" rel="stylesheet" type="text/css"><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mutationObserver.js"></script><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.js"></script></head>
+<body lang="fr-FR" text="#000000" dir="ltr" style="background: transparent">
+<h1 align="center">TP 3 : TP Introduction aux automates à états
+finis : <br>application à l'analyse syntaxique</h1>
+<h3 align="center">Christophe Servan (d'après Laurent Besacier) 
+</h3>
+	<hr>
+	<h2>Outils</h2>
+	<ul>
+		<li>OpenFST : permet de créer et d'utiliser des automates à états finis. 
+		
+		</li><li>OpenGRM : permet de créer et d'utiliser des grammaires au format de OpenFST. 
+		
+		</li><li>Installation :
+			<ul>
+				<li>Téléchargez le script <tt>fst_and_grm_installation.bash</tt> (<a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/fst_and_grm_installation.bash">ici</a>) puis lancez-le avec la commande :<pre>bash fst_and_grm_installation.bash</pre><b>ATTENTION : </b> sur les machines des salles, dans le script d'installation, vous devez remplacez le texte "/home/$USER" par le chemin de votre "home directory"<br> <br>
+				</li><li>Une fois l'installation terminée, lancez la commande : <pre>source ~/.bashrc</pre>
+				</li><li>Testez votre installation en lançant <pre>fstcompose -help </pre> et <pre>ngrammake -help </pre>
+			</li></ul>
+	</li></ul>
+	<h2>Données</h2>
+	
+	<ul>
+		<li>Les 4 fichiers <tt>train.words.txt</tt>, <tt>test.words.txt</tt>, <tt>train.tags.txt</tt> et <tt>test.tags.txt</tt> sont disponibles <a href="http://www-clips.imag.fr/geod/User/christophe.servan/tools/tp3_files.tgz">ici</a>
+		</li><li>Décompréssez-les avec la commande :<pre>tar xvfz tp3_files.tgz </pre>
+	</li></ul>
+	<hr>
+	<h2>Rendu du TP 
+	</h2>
+	<p>TP à rendre avant le <b>01/03 avant 23h59</b> au format <b>PDF</b>
+	à l'adresse christophe_dot_servan_at_imag_dot_fr (remplacez les
+	_dot_ et _at_ par des points et arobases, respectivement) </p><p>
+	<em>Remarques :</em>
+	</p><ul>
+		<li>Si vous avez des difficultés, vous pouvez me contacter par mail, je vous répondrai dans les meilleurs délais.
+		</li><li>En cas de retard, des pénalités seront retenues sur la note.
+	</li></ul>
+	<p></p>
+	<hr>
+	<h2>Travail à réaliser</h2>
+	<ol>
+		<ol>
+			Ce TP se décompose en cinq parties distinctes : 
+			 
+			<ul>
+				<li>La première est la création des dictionnaires indispensables pour l'utilisation des automates à états finis.
+				</li><li>La seconde est la réalisation d'un décodeur permettant
+				de produire des labels en fonction des mots. 
+				</li><li>La troisième consiste en la réalisation d'un modèle de
+				langage permettant la ré-estimation des hypothèses de production. 
+                                </li><li>La quatrième est la réunification des deux précédentes parties. 
+                                </li><li>Enfin, l'évaluation du système. 
+			</li></ul>
+			Les réalisation des parties deux et trois sont indépendantes,
+			cependant, je vous invite à respecter l'ordre de réalisation. 
+		
+	</ol>
+	<h3>I. Création des dictionnaires et des corpus d'apprentissage</h3>
+	<ol>
+		<p>L'idée principale est d'utiliser vos connaissances acquises lors des précédents TPs pour réaliser des dictionnaires et mettre en forme les corpus d'apprentissage pour les automates.
+		Ces dictionnaires sont une <a href="https://fr.wikipedia.org/wiki/Table_de_hachage">table de hashage</a> indispensable à l'utilisation des automates.</p>
+		
+		<p><b>ATTENTION IMPORTANT:</b> tout mot n'existant pas de dictionnaire ne pourra être utilisé avec les automates.</p>
+		<ol>
+			<p><strong>Exercice 1 :</strong> Création d'un fichier
+			d'apprentissage mots-labels. Vous devez créer un corpus
+			d'apprentissage composé des mots et labels collés grâce à un ou
+			des caractère(s) spécial(aux) (comme "_" ou "|" pas espace ni tabulation) à partir des fichiers <tt>train.words.txt</tt> et <tt>train.tags.txt</tt>. Vous l'appellerez <tt>train.decoder.col.txt</tt>
+			</p><ol>
+				<p><strong>Q1 :</strong> indiquez quelles sont les commandes que vous utilisez. <br><em>Remarque :</em> Vous ne devez pas mettre de séparateur sur les lignes vides. Votre fichier final devrait ressemble à ceci:</p>
+<pre>...
+fin|NN
+.|PUNCT
+
+Le|DET
+...
+</pre>
+		
+				 
+			<em>Rappel :</em> la commande linux <tt>paste</tt> permet 
+			de " coller " deux fichiers. Vous pouvez utiliser les expression régulières avec <tt>perl</tt> ou <tt>awk</tt> pour le remplacement de caractères.
+			<p></p>
+			</ol>
+			<p><strong>Exercice 2 :</strong> Création d'un fichier
+			d'apprentissage pour les labels. Vous devez créer un corpus
+			d'apprentissage composé des labels à partir du fichiers <tt>train.tags.txt</tt>. Vous l'appellerez <tt>train.tags-lm.txt</tt>.<br>
+			L'idée est de remettre en forme le fichier pour passer d'un format "colonnes" au format "lignes",<br>tel que :</p>
+			<pre>	...
+	NN
+	PUNCT
+	
+	DET
+	...
+			</pre>
+			deviennes :
+			<pre>	... NN PUNCT
+	DET ...
+			</pre>
+			<ol>
+				<p><strong>Q1 :</strong> indiquez quelles sont les commandes que vous utilisez. </p>
+				<p><strong>Q2 :</strong> faites de même avec le fichier <tt>train.decoder.col.txt</tt> et mettez le résultat dans <tt>train.decoder.txt</tt> </p>
+				<p><strong>Q3 :</strong> même opération avec le fichier <tt>test.tags.txt</tt> et mettez le résultat dans <tt>test.tags.ref.txt</tt></p>
+				<p><strong>Q4 :</strong> même opération avec le fichier <tt>test.words.txt</tt> et mettez le résultat dans <tt>test.words.src.txt</tt></p>
+		
+			</ol>
+			<p><strong>Exercice 3 :</strong> Création des dictionnaires. Vous allez créér trois dictionnaires.
+			Le premier à partir du fichier <tt>train.decoder.txt</tt> que vous appelerez <tt>train.decoder.dic</tt>.
+			Le second à partir du fichier <tt>train.words.txt</tt> et <tt>test.words.txt</tt> que vous appelerez <tt>words.dic</tt> et 
+			le dernier à partir du fichier <tt>train.tags.txt</tt> et <tt>test.tags.txt</tt> que vous appelerez <tt>tags.dic</tt>.
+			Ces dictionnaires sont une liste de mots (ou tokens) uniques que vous transmettrez au script <tt>create_dictionnaire.py</tt> (python3) pour réaliser vos dictionnaires.	</p>
+		
+			<ol>
+				<p><strong>Q1 :</strong> indiquez quelles sont les commandes que vous utilisez. </p>
+				<p><strong>Q2 :</strong> que remarquez-vous dans les fichiers obtenus ?</p>
+			<em>Rappel :</em> la commande linux <tt>sort</tt> permet de faire des tris uniques. 
+			</ol>
+		</ol> 
+	</ol>	 
+	<h3>II. Réalisation du décodeur</h3>
+	<ol>
+		<p>
+		L'idée principale est d'utiliser des automates à état finis
+		pour projeter des mots vers des labels. Nous allons utiliser quelques particularités et avantages des automates pour créer le décodeur.
+		Dans un premier temps nous allons apprendre un modèle de langage mots-labels, puis nous découperons ce modèle de langage pour obtenir une projection mot vers label.
+		Enfin, nous conserverons les valeurs associées aux paires mots-labels pour les attribuer aux projections mots-&gt;labels.
+		</p> 
+		 
+		<ol>
+			<p><strong>Exercice 1 :</strong> Création d'un automate compressé.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>farcompilestrings -symbols=train.decoder.dic --keep_symbols=1 train.decoder.txt &gt; train.decoder.far </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+			</ol>
+			<p><strong>Exercice 2 :</strong> Comptage des fréquences des n-grammes à partir des automates compressés.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>ngramcount --order=2 train.decoder.far &gt; train.decoder.counts </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+			</ol>
+			<p><strong>Exercice 3 :</strong> Apprentissage du modèle de langage probabiliste à partir des automates comptes obtenus.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>ngrammake --method="kneser_ney" train.decoder.counts | fstclosure &gt; train.decoder.lm </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+				<p><strong>Q3 : </strong> A quoi le terme "kneser_ney" fait-il référence ?</p>		 
+			</ol>
+			<p><strong>Exercice 4 :</strong> Apprentissage du modèle de projection probabiliste à partir du modèle de langage.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>fstprint --isymbols=train.decoder.dic --osymbols=train.decoder.dic train.decoder.lm &gt; train.decoder.lm.fst </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+				<p><strong>Q3 : </strong> Ouvrez le fichier <tt>train.decoder.lm.fst</tt> avec un éditeur de texte décrivez ce que vous voyez. A quoi correspondent les colonnes ?<br><b>ATTENTION : me modifiez pas le fichier</b> ce pourrait compromettre la suite du TP</p>
+				<p><strong>Q4 : </strong> Découpez le fichier <tt>train.decoder.lm.fst</tt> suivant le caractère spécial que vous avez choisi dans l'exercice 1 de la première partie de ce TP (remplacez-le par une tabulation "<tt>\t</tt>"), puis récupérez seulement 5 des 7 colonnes obtenues : 2 colonne d'indices 1 colonne de mots, 1 de labels et 1 de valeurs. Vous mettrez le tout dans le fichier <tt>train.decoder.prob.fst</tt>. <br><em>Remarque :</em> certaines lignes n'ont pas de colonne "valeurs", cependant, vous devez conserver ces lignes sous la forme de 2 colonne d'indices 1 colonne de mots, 1 de labels. Par exemple, on doit passer du format de fichier <tt>train.decoder.lm.fst</tt> : </p>
+<pre>480483	1	&lt;eps&gt;	&lt;eps&gt;
+480483
+0	778	$|||$	$|||$	6.26992989
+0	762	#|||#	#|||#	8.64850044
+0	303035	0.0015|||CD	0.0015|||CD	11.5929394
+0	39620	0.0108|||CD	0.0108|||CD	11.5929394
+</pre>
+devient:
+<pre>480483	1	&lt;eps&gt;	&lt;eps&gt;
+480483
+0	778	$	$	6.26992989
+0	762	#	#	8.64850044
+0	303035	0.0015	CD	11.5929394
+0	39620	0.0108	CD	11.5929394
+</pre>
+				<p><strong>Q5 (optionnel) : </strong> Reprennez le découpage de la Q4 sans la colonne de valeur et mettez le tout dans le fichier <tt>train.decoder.noprob.fst</tt></p>
+				<em>Rappel :</em> la commande linux <tt>cut</tt> permet d'affichage des champs désirés d'un fichier. Vous pouvez également utiliser un script en ligne de commande via <tt>perl</tt> ou <tt>awk</tt>.
+			</ol>
+		</ol>
+	</ol>
+	<h3>III. Réalisation du modèle de langage </h3>
+	<ol>
+		<p> Cette partie est presque identique à la précédente. Pour des questions pratiques, les commandes et les question sont les même. Toutefois, si vous avez déjà fait la partie précedente, vous n'avez pas à répondre aux question 2 &amp; 3 des trois premiers exercices.</p>
+		<ol>
+			<p><strong>Exercice 1 :</strong> Création d'un automate compressé.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>farcompilestrings -symbols=tags.dic --keep_symbols=1 train.tags-lm.txt &gt; train.tags-lm.far </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+			</ol>
+			<p><strong>Exercice 2 :</strong> Création des comptes issus des automates compressés.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>ngramcount --order=5 train.tags-lm.far &gt; train.tags-lm.counts </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+			</ol>
+			<p><strong>Exercice 3 :</strong> Apprentissage du modèle de langage probabiliste à partir des automates comptes obtenus.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>ngrammake --method="kneser_ney" train.tags-lm.counts | fstclosure &gt; train.tags-lm.fsa </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 
+				<p><strong>Q3 : </strong> A quoi le terme "kneser_ney" fait-il référence ?</p>		 
+			</ol>
+			<p><strong>Exercice 4 :</strong> Affichage des données .</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>fstprint --isymbols=tags.dic --osymbols=tags.dic train.tags-lm.fsa &gt; train.tags-lm.fst </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez le contenu du fichier <tt> train.tags-lm.fst </tt>.</p>		 
+			
+			</ol>
+		</ol>
+	</ol>
+	<h3>IV. Création du système de labellisation</h3>
+	<ol>
+		<p> Cette partie va vous permettre de créer le système d'étiquetage syntaxique à partir des modèles que vous avez créé dans les précédentes parties.</p>
+		<ol>
+			<p><strong>Exercice 1 :</strong> Création d'un automate mange-tout (ou "filler"). Cet automate vas vous permettre d'autoriser toutes les séquences de mot possibles.</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : 
+				</p><pre>cut -f1 -d' ' words.dic | python3 txt2fst.py | awk '{if (NF&gt;1) print $1"\t"$2"\t"$3"\t&lt;eps&gt;\t10000"; else print $0}' &gt; filler.words-tags.fst
+fstcompile --isymbols=words.dic --osymbols=tags.dic filler.words-tags.fst | fstclosure &gt; filler.words-tags.fsa
+cut -f1 -d' ' tags.dic | python3 txt2fst.py | awk '{if (NF&gt;1) print $1"\t"$2"\t"$3"\t&lt;eps&gt;\t10000"; else print $0}' &gt; filler.tags.fst
+fstcompile --isymbols=tags.dic --osymbols=tags.dic filler.tags.fst | fstclosure &gt; filler.tags.fsa</pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>		 		
+			</ol>
+			<p><strong>Exercice 2 :</strong> Finalisation du décodeur et du modèle de langage</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>fstcompile --isymbols=words.dic --osymbols=tags.dic filler.words-tags.fst | fstrmepsilon | fstclosure &gt; filler.words-tags.fsa
+fstcompile --isymbols=tags.dic --osymbols=tags.dic filler.tags.fst | fstrmepsilon | fstclosure &gt; filler.tags.fsa
+fstcompile --isymbols=words.dic --osymbols=tags.dic train.decoder.prob.fst | fstclosure &gt; train.decoder.prob.fsa
+fstunion train.decoder.prob.fsa filler.words-tags.fsa | fstclosure &gt; train.decoder.filler.prob.fsa
+fstunion train.tags-lm.fsa filler.tags.fsa | fstclosure &gt; train.tags-lm.filler.fsa </pre><p></p>
+				<p><strong>Q2 : </strong> Décrivez la fonction des commandes utilisées.</p>
+				<p><strong>Q3 : (optionnel)</strong> lancez ces commandes de la question 2 pour le décodeur sans probabilités.</p>
+			</ol>
+			<p><strong>Exercice 3 :</strong> Comparaisons des approches</p>
+			<ol>
+				<p><strong>Q1 : </strong> lancez les lignes de commande suivante : </p><pre>echo "In January , he accepted the position of vice chairman of Carlyle Group , a merchant banking concern . " | python3 txt2fst.py | fstcompile --isymbols=words.dic --acceptor=true - first_test.fsa
+fstcompose first_test.fsa train.decoder.filler.prob.fsa | fstshortestpath | fstrmepsilon &gt; lineoutput.fsa
+fstprint -isymbols=words.dic --osymbols=tags.dic lineoutput.fsa | python3 ordertxtfst.py &gt; lineoutput.txt
+fstdraw -isymbols=words.dic --osymbols=tags.dic lineoutput.fsa | dot -Tps &gt; lineoutput.ps
+
+		</pre><p></p>
+				<p><strong>Q2 : </strong> Décrivrez les nouvelles commandes 
+				</p><p><strong>Q3 : </strong> Quel résultats obtenez-vous ?</p>		 
+				<p><strong>Q4 : </strong> Lancez ces lignes de commandes :		 
+		</p><pre>fstcompose first_test.fsa train.decoder.filler.prob.fsa | fstarcsort | fstcompose - train.tags-lm.filler.fsa | fstshortestpath | fstrmepsilon | tee lineoutput_full_decoding.fsa | fstprint --isymbols=words.dic --osymbols=tags.dic - | python3 ordertxtfst.py &gt; lineoutput_full_decoding.txt
+fstdraw -isymbols=words.dic --osymbols=tags.dic lineoutput_full_decoding.fsa | dot -Tps &gt; lineoutput_full_decoding.ps
+
+		</pre><p></p>		
+				<p><strong>Q5 : </strong> Quel résultats obtenez-vous ? Comparez la sortie avec les résultats de la question 3. Est-ce mieux ?</p>
+				<p><strong>Q6 (optionnel) : </strong> Relancez les commande la question 4 en remplaçant <tt>train.decoder.filler.prob.fsa</tt> par <tt>train.decoder.filler.noprob.fsa</tt>. Quel résultat obtenez-vous ? </p>
+				<p><strong>Q7 (optionnel) : </strong> Comparez la sortie avec les résultats de la question 4. En quoi est-ce différent ?</p>
+			</ol>
+		</ol>
+	</ol>
+	<h3>V. Evaluation du système</h3>
+	<ol>
+		<p> Le système est créé maintenant vous allez l'évaluer sur un corpus de test : <tt>test.words.src.txt</tt> </p>
+		<p><em>Remarque : </em> Vous pouvez créer un script (en python, perl, bash...) qui réalisera les opération de l'excercice 1 &amp; une partie de l'excercice 2.</p>
+		<ol>
+			<p><strong>Exercice 1 :</strong> Création des automates pour chaque hypothèse. Vos automates auront la dénomitation suivante : <tt>ligne_&lt;NL&gt;.fsa</tt> où <tt>NL</tt> est le numéro de ligne.</p>
+			<ol>
+				<p><strong>Q1 : </strong> A l'aide du script <tt>txt2fst.py</tt> créez un automate par ligne du fichier de test : quelles sont les commandes à utilisez, sachant que ce script prend en entrée une version texte d'un automate ?</p>
+			</ol>
+			<p><strong>Exercice 2 :</strong> Evaluation des hypothèses </p>
+			<ol>
+				<p><strong>Q2 : </strong> Concaténez l'ensemble des lignes produites avec le précédent exercice dans l'ordre et mettez le tout dans le fichier <tt>test.tags.hyp.txt</tt>. Quelles commandes utilisez-vous ?</p>
+				<p><strong>Q3 : </strong> Lancez le script <tt>eval.py</tt> comme ceci : </p><pre>python3 eval.py test.tags.hyp.txt test.tags.ref.txt</pre> Quel résultat obtenez-vous ?<p></p>
+			</ol>
+			<p><strong>Exercice 2 (optionnel) :</strong> Evaluation des hypothèses avec le décodeur non-probabiliste</p>
+			<ol>
+				<p><strong>Q1 : </strong> Refaite l'exercice précédent avec le système utilisant un décodeur non-probabiliste. Qu'observez-vous ?</p>
+			</ol>
+		</ol>
+	</ol>
+</ol>
+ <br> <br>The End.
+
+
+<mytubeelement id="myTubeRelayElementToPage" event="preferencesUpdated" data="{&quot;bundle&quot;:{&quot;label_delimitor&quot;:&quot;:&quot;,&quot;percentage&quot;:&quot;%&quot;,&quot;smart_buffer&quot;:&quot;Smart Buffer&quot;,&quot;start_playing_when_buffered&quot;:&quot;Start playing when buffered&quot;,&quot;sound&quot;:&quot;Sound&quot;,&quot;desktop_notification&quot;:&quot;Desktop Notification&quot;,&quot;continuation_on_next_line&quot;:&quot;-&quot;,&quot;loop&quot;:&quot;Loop&quot;,&quot;only_notify&quot;:&quot;Only Notify&quot;,&quot;estimated_time&quot;:&quot;Estimated Time&quot;,&quot;global_preferences&quot;:&quot;Global Preferences&quot;,&quot;no_notification_supported_on_your_browser&quot;:&quot;No notification style supported on your browser version&quot;,&quot;video_buffered&quot;:&quot;Video Buffered&quot;,&quot;buffered&quot;:&quot;Buffered&quot;,&quot;hyphen&quot;:&quot;-&quot;,&quot;buffered_message&quot;:&quot;The video has been buffered as requested and is ready to play.&quot;,&quot;not_supported&quot;:&quot;Not Supported&quot;,&quot;on&quot;:&quot;On&quot;,&quot;off&quot;:&quot;Off&quot;,&quot;click_to_enable_for_this_site&quot;:&quot;Click to enable for this site&quot;,&quot;desktop_notification_denied&quot;:&quot;You have denied permission for desktop notification for this site&quot;,&quot;notification_status_delimitor&quot;:&quot;;&quot;,&quot;error&quot;:&quot;Error&quot;,&quot;adblock_interferance_message&quot;:&quot;Adblock (or similar extension) is known to interfere with SmartVideo. Please add this url to adblock whitelist.&quot;,&quot;calculating&quot;:&quot;Calculating&quot;,&quot;waiting&quot;:&quot;Waiting&quot;,&quot;will_start_buffering_when_initialized&quot;:&quot;Will start buffering when initialized&quot;,&quot;will_start_playing_when_initialized&quot;:&quot;Will start playing when initialized&quot;,&quot;completed&quot;:&quot;Completed&quot;,&quot;buffering_stalled&quot;:&quot;Buffering is stalled. Will stop.&quot;,&quot;stopped&quot;:&quot;Stopped&quot;,&quot;hr&quot;:&quot;Hr&quot;,&quot;min&quot;:&quot;Min&quot;,&quot;sec&quot;:&quot;Sec&quot;,&quot;any_moment&quot;:&quot;Any Moment&quot;,&quot;popup_donate_to&quot;:&quot;Donate to&quot;,&quot;extension_id&quot;:&quot;lnkdbjbjpnpjeciipoaflmpcddinpjjp&quot;},&quot;prefs&quot;:{&quot;desktopNotification&quot;:true,&quot;soundNotification&quot;:true,&quot;logLevel&quot;:0,&quot;enable&quot;:true,&quot;loop&quot;:false,&quot;hidePopup&quot;:false,&quot;autoPlay&quot;:false,&quot;autoBuffer&quot;:false,&quot;autoPlayOnBuffer&quot;:false,&quot;autoPlayOnBufferPercentage&quot;:42,&quot;autoPlayOnSmartBuffer&quot;:true,&quot;quality&quot;:&quot;default&quot;,&quot;fshd&quot;:false,&quot;onlyNotification&quot;:false,&quot;enableFullScreen&quot;:true,&quot;saveBandwidth&quot;:false,&quot;hideAnnotations&quot;:false,&quot;turnOffPagedBuffering&quot;:false}}"></mytubeelement><mytubeelement id="myTubeRelayElementToTab" event="relayPrefs" data="{&quot;loadBundle&quot;:true}"></mytubeelement></body></html>
