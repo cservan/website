@@ -1,0 +1,51 @@
+INSTALLATION DE SRILM
+
+	- Creer un repertoire d'installation :
+	(avec les droits administrateurs dans /usr/local, sinon, peu importe ou...)
+		mkdir srilm-1.4.5
+		cd srilm-1.4.5
+
+	- telecharger le fichier srilm.tgz a l'adresse :
+	http://www.speech.sri.com/projects/srilm/download.html
+
+	- decompresser l'archive 
+		tar xvfz srilm-1.4.5.tgz
+
+	- editer le fichier Makefile et remplacer la ligne :
+		# SRILM = /home/speech/stolcke/project/srilm/devel
+		par
+		SRILM = /usr/local/srilm-1.4.5
+		(le chemin du repertoire que vous avez cree)
+
+	- executer la commande pour connaitre la plateforme
+		./sbin/machine-type
+
+	- editer le fichier common/Makefile.machine.<plateforme>
+	(dans notre cas, common/Makefile.machine.i686)
+	* remplacer les lignes
+		GCC_FLAGS = -mtune=pentium3 -Wreturn-type -Wimplicit
+		CC = /usr/local/lang/gcc-3.4.3/bin/gcc $(GCC_FLAGS)
+		CXX = /usr/local/lang/gcc-3.4.3/bin/g++ -Wno-deprecated $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+	par
+		GCC_FLAGS = -march=i686 -Wreturn-type -Wimplicit
+		CC = /usr/bin/gcc $(GCC_FLAGS)
+		CXX = /usr/bin/g++ -Wno-deprecated $(GCC_FLAGS) -DINSTANTIATE_TEMPLATES
+	* remplacer les lignes (uniquement si necessaire)
+		#TCL_INCLUDE =
+		#TCL_LIBRARY = -ltcl
+	par
+		TCL_INCLUDE = -I/usr/include/tcl8.4
+		TCL_LIBRARY = -ltcl8.4
+
+	- executer la commande 
+		make World
+
+
+UTILISATION DE SRILM
+
+	- definir les variables d'environnement 
+	en csh :
+		set SRILM=/usr/local/bin/i686/
+ 		setenv LC_ALL C
+
+
