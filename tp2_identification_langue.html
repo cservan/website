@@ -34,7 +34,7 @@
 
 <hr>
 <h2> Rendu du TP </h2>
-<p>TP à rendre avant le <b>16/02 avant 23h59</b> au format <b>PDF</b> à l'adresse christophe_dot_servan_at_imag_dot_fr (remplacez les _dot_ et _at_ par des points et arobases, respectivement) </p>
+<p>TP à rendre avant la <b>prochaine session avant 23h59</b> au format <b>PDF</b> à l'adresse christophe_dot_servan_at_epita_dot_fr (remplacez les _dot_ et _at_ par des points et arobases, respectivement) </p>
 <hr>
 <!----------------------------------------------------------------------------->
 
@@ -84,17 +84,30 @@ ngram-count&nbsp;-read fr3g.bo -lm fr3g.BO -gt2min 1 -gt3min 2
 <p><em>Aide :</em> Un modèle peut être considéré plus performant qu'un autre si, pour un texte de la même langue, la perplexité est inférieure et, pour un texte dans une autre langue, la perplexité est supérieure.</p>
 
 <hr>
+<p><strong>Exercice 5 : Étendre la matrice de perpléxités pour toutes les autres langues </strong> .</p>
+
+<ul>
+<li><strong>Q1 :</strong> Vérifier quelles sont les paires de langues les plus faciles/difficiles à distinguer les unes des autres </li>
+<li><strong>Q2 :</strong> Refaire le modèle en remplaçant l'espace par un symbole quelconque (p. ex., &lt;SPACE&gt;). Quelles sont les perplexités pour ce modèle ?</li>
+</ul>
+
+<p><strong>Exercice 6 : Refaire le TP avec <a href="https://github.com/facebookresearch/fastText.git">fastText</a> </strong> .</p>
+
+<ul>
+<li><strong>Q1 :</strong> Refaire la matrice de confusion avec un modèle appris avec fasttext </li>
+<li><strong>Q2 :</strong> Quels sont les avantages que vous pouvez identifier à l'utilisation de fasttext par rapport aux modèles de langue ?</li>
+</ul>
+
+<p><em>Aide :</em> Il vous faudra apprendre un modèle en mode <tt>supervised</tt> afin de réussir cette exercice. Devant chacune des phrase il vous faudra rajouter un label sous la forme <tt>__label__XX</tt> où <tt>XX</tt> sera remplacé par le code de langue du corpus d'apprentissage (fr pour français, en pour anglais, etc.).</p>
+
 <!----------------------------------------------------------------------------->
 
 <h2>Extensions</h2>
-
 <ul>
-<li> Étendre la matrice de perpléxités pour toutes les autres langues. Vérifier quelles sont les paires de langues les plus faciles/difficiles à distinguer les unes des autres.</li>
-<li>Construire des modèles de différents ordres (paramètre <tt>order</tt>) et vérifier lequel est plus efficace dans la détection de la langue</li>
+<!-- <li> Étendre la matrice de perpléxités pour toutes les autres langues. Vérifier quelles sont les paires de langues les plus faciles/difficiles à distinguer les unes des autres.</li> -->
+<!-- <li>Construire des modèles de différents ordres (paramètre <tt>order</tt>) et vérifier lequel est plus efficace dans la détection de la langue</li> -->
 <li>Étudier l'influence de la taille du fichier d'apprentissage dans la performance du système. Montrer graphiquement l'impact sur les perplexités pour plusieurs tailles de fichier d'apprentissage.</li>
-<li>Répondre à la question : quelle est la taille du plus petit fichier de test pour lequel l'identification peut être effectuée avec ces modèles ? Par exemple, est-ce que avec un fichier contenant seulement une phrase l'identification est possible ? Et un seul mot ? Et un seul caractère ?</li>
-<li>Faire varier la valeur des paramètres <tt>gt2min</tt> et <tt>gt3min</tt> : quelle est l'influence de ces paramètres sur les perplexités calculées ?</li>
+<!-- <li>Répondre à la question : quelle est la taille du plus petit fichier de test pour lequel l'identification peut être effectuée avec ces modèles ? Par exemple, est-ce que avec un fichier contenant seulement une phrase l'identification est possible ? Et un seul mot ? Et un seul caractère ?</li> -->
+<!-- <li>Faire varier la valeur des paramètres <tt>gt2min</tt> et <tt>gt3min</tt> : quelle est l'influence de ces paramètres sur les perplexités calculées ?</li> -->
 </ul>
-
-
 </body></html>
