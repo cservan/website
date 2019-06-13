@@ -34,6 +34,7 @@
   <li>Deux textes de taille équivalente en deux langues différentes</li>
 	<ul>
 	<li>Utiliser les <a href="data/tp2_files.tgz">fichiers fournis</a></li>
+    <li>Tokenizez les fichiers au besoin.</li>
 	<!-- <li>Choisir des textes au hasard sur le web → faire attention à la séparation des phrases, aux majuscules et à la tokenisation. -->
 	</li></ul>  
 </ul>
@@ -45,6 +46,8 @@
 <!----------------------------------------------------------------------------->
 
 <h2>Travail à réaliser</h2>
+
+<h3>Partie 1:</h3>
 
 <p><strong>Exercice 1 :</strong> Couper chaque fichier de chaque langue en deux parties contenant un nombre de lignes égal (par exemple, on coupe le fichier <tt>fr.txt</tt> en un fichier <tt>train.fr</tt> et un fichier <tt>test.fr</tt>)</p>
 
@@ -96,10 +99,12 @@ ngram-count&nbsp;-read fr3g.bo -lm fr3g.BO -gt2min 1 -gt3min 2
 <li><strong>Q2 :</strong> Refaire le modèle en remplaçant l'espace par un symbole quelconque (p. ex., &lt;SPACE&gt;). Quelles sont les perplexités pour ce modèle ?</li>
 </ul>
 
-<p><strong>Exercice 6 :</strong> Refaire le TP avec <a href="https://github.com/facebookresearch/fastText.git">fastText</a>.</p>
+<h3>Partie 2:</h3>
+
+<p><strong>Exercice 1 :</strong> Identification de langue avec <a href="https://github.com/facebookresearch/fastText.git">fastText</a>.</p>
 
 <ul>
-<li><strong>Q1 :</strong> Refaire la matrice de confusion avec un modèle appris avec fasttext </li>
+<li><strong>Q1 :</strong> Refaire la matrice de confusion avec un modèle appris avec fasttext en utlisant tous les corpus d'apprentissage.</li>
 <li><strong>Q2 :</strong> Quels sont les avantages que vous pouvez identifier à l'utilisation de fasttext par rapport aux modèles de langue ?</li>
 </ul>
 
