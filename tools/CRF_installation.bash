@@ -1,4 +1,4 @@
-DESTINATION=/$HOME/Tools/CRF++
+DESTINATION=/$HOME/Tools/CRF++-0.58/
 
 rm -rf $DESTINATION
 mkdir -pv /$HOME/Tools/
