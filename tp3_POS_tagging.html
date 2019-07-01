@@ -268,15 +268,26 @@ fstdraw -isymbols=words.dic --osymbols=tags.dic lineoutput_full_decoding.fsa | d
 			</ol>
 			<p><strong>Exercice 2 :</strong> Evaluation des hypothèses </p>
 			<ol>
-				<p><strong>Q2 : </strong> Concaténez l'ensemble des lignes produites avec le précédent exercice dans l'ordre et mettez le tout dans le fichier <tt>test.tags.hyp.txt</tt>. Quelles commandes utilisez-vous ?</p>
-				<p><strong>Q3 : </strong> Lancez le script <tt>eval.py</tt> comme ceci : </p><pre>python3 eval.py test.tags.hyp.txt test.tags.ref.txt</pre> Quel résultat obtenez-vous ?<p></p>
+				<p><strong>Q1 : </strong> Concaténez l'ensemble des lignes produites avec le précédent exercice dans l'ordre et mettez le tout dans le fichier <tt>test.tags.hyp.txt</tt>. Quelles commandes utilisez-vous ?</p>
+				<p><strong>Q2 : </strong> Lancez le script <tt>eval.py</tt> comme ceci : </p><pre>python3 eval.py test.tags.hyp.txt test.tags.ref.txt</pre> Quel résultat obtenez-vous ?<p></p>
 			</ol>
-			<p><strong>Exercice 2 (optionnel) :</strong> Evaluation des hypothèses avec le décodeur non-probabiliste</p>
+			<p><strong>Exercice 3 (optionnel) :</strong> Evaluation des hypothèses avec le décodeur non-probabiliste</p>
 			<ol>
 				<p><strong>Q1 : </strong> Refaite l'exercice précédent avec le système utilisant un décodeur non-probabiliste. Qu'observez-vous ?</p>
 			</ol>
 		</ol>
 	</ol>
+	<h3>VI. Conditionnal Random Fields (CRF)</h3>
+	<ol>
+		<p> Maintenant que vous maîtrisez les bases du POS tagging, utilisez les CRF pour étiquetter vos phrases. </p>
+		<ol>
+			<p><strong>Exercice 1 :</strong> Utilisez <a href="https://taku910.github.io/crfpp/">CRF++</a> et installer l'outli avec le script d'installation <a href="https://cservan.github.io/website/tools/CRF_installation.bash">ici</a>. 
+            </p>
+            <p>
+			<ol>
+				<p><strong>Q1 : </strong> C'est à vous de jouer pour que les formats de fichier puissent être utilisés par l'outil CRF++, vous voici apprenti Data Scientist !</p>
+			</ol>    
+        </ol>
 </ol>
  <br> <br>The End.
 
