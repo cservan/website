@@ -149,15 +149,15 @@ Train data and validataion data are required for machine translation training. â
 <ul>
 <li>i => input</li>
 <li>o => Output(*.code)</li>
-<li>s => Symbol (Usually use 32000)</li>
+<li>s => Symbol (Usually use 32000 but we will use a lower value: 16k to speed up the training)</li>
 <li>learn_bpe ==> make code</li>
 <li>apply_bpe ==> apply subwordTokenization</li>
 <li>src-train, src-val,test => Need to apply src.code</li>
 <li>tgt-train, tgt-val => Need to apply tgt.code </li>
 <li>command lines:</br>
 
-<tt>python OpenNMT-tf/third_party/learn_bpe.py -i train.fr -o fr.code -s 32000</tt></br>
-<tt>python OpenNMT-tf/third_party/learn_bpe.py -i train.en -o en.code -s 32000</tt></br>
+<tt>python OpenNMT-tf/third_party/learn_bpe.py -i train.fr -o fr.code -s 16000</tt></br>
+<tt>python OpenNMT-tf/third_party/learn_bpe.py -i train.en -o en.code -s 16000</tt></br>
 <tt>python OpenNMT-tf/third_party/apply_bpe.py -c  fr.code -i  train.fr -o train.fr.bpe</tt></br>
 <tt>python OpenNMT-tf/third_party/apply_bpe.py -c  en.code -i  train.en -o train.en.bpe</tt></br>
 <tt>python OpenNMT-tf/third_party/apply_bpe.py -c  fr.code -i  EMEA_dev.fr -o EMEA_dev.fr.bpe</tt></br>
