@@ -17,4 +17,4 @@ pushd $DESTINATION
 #
 popd
 
-. ~/.bashrc
+source ~/.bashrc
