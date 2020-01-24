@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0073)https://cservan.github.io/website/tp3_POS_tagging.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title>Demo 3: Part-of-Speech Tagging part 2: Conditionnal Random Fields (CRF)</title>
+<link href="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.css" rel="stylesheet" type="text/css"><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mutationObserver.js"></script><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.js"></script></head>
+<body lang="fr-FR" text="#000000" dir="ltr" style="background: transparent">
+<h1 align="center">Demo 3: Part-of-Speech Tagging part 2: Conditionnal Random Fields (CRF)</h1>
+<h3 align="center">Christophe Servan 
+</h3>
+	<hr>
+	<h2>Tools</h2>
+	<ul>
+		<li>CRF++: enable you to create and use CRF models. 
+		
+		</li><li>Installation :
+			<ul>
+				<li>Download the installation script <tt><a href="https://cservan.github.io/website/tools/CRF_installation.bash">CRF_installation.bash</a></tt> then type :<pre>bash CRF_installation.bash</pre><b>WARNING : </b> the tool will be installed by default into the "tools" directory located into your home directory. <br> <br>
+				</li><li>Once the installation is done, type <pre>source ~/.bashrc</pre>
+				</li><li>Test your installation by typing <pre>crf_learn --help</pre> the result should print the help of the CRF command.
+			</li></ul>
+	</li></ul>
+	<h2>Data</h2>
+	
+	<ul>
+		<li>USe the same data files given in the Demo 2: <tt>train.words.txt</tt>, <tt>test.words.txt</tt>, <tt>train.tags.txt</tt> and <tt>test.tags.txt</tt> available <a href="https://cservan.github.io/website/data/tp3_files.tgz">here</a>
+		</li><li>Decompress then using tar :<pre>tar xvfz tp3_files.tgz </pre> <b>or</b> <pre>gunzip tp3_files.tgz </pre> and then <pre>tar xvf tp3_files.tar </pre>
+	</li></ul>
+	<hr>
+	<h2>Report
+	</h2>
+	<p>You should send me your report<u><b>before the next session</b></u> using <b>PDF</b> format
+	at the address christophe_dot_servan_at_epita_dot_fr (replace
+	_dot_ and _at_ by dots and at, respectively) </p><p>
+	<em>Remarks:</em>
+	</p><ul>
+		<li>If you encounter some issues, feel free to send me an email, I'll answer you ASAP;
+		</li><li>If you send me your report lately, you will be penalised ;
+		</li><li>the report mark is important for the final course mark ;
+		</li><li>jupyternotes and others will be ignored. I want you to write a report, not a script.
+	</li></ul>
+	<p></p>
+	<hr>
+	<h2>Work to do</h2>
+	<ol>
+		<ol>
+			This TP is the first where you will work with few indications 
+			 
+			<ul>
+				<li>Fristly you will find how to modify the data to fit then to the right CRF format. 
+				</li><li>Then you will find how to train your model. 
+				</li><li>Finally, you will test your model and give feed backs. 
+			</li></ul>
+	</ol>
+	<h3>I. Creating data</h3>
+	<ol>
+		<p>The main idea is to fits the raw data to the CRF format. you will find additionnal informations in the documentation <a href="https://taku910.github.io/crfpp/">here</a></p>
+		
+		<p><b>WARNING:</b> Read carefully the documentation. if the file is not at the right format it won't work.</p>
+		<ol>
+			<p><strong>Exercice 1:</strong> You have to create a train and a test corpora composed of words and labels.
+			</p><ol>
+				<p><strong>Q1 :</strong> Give a description of the file format.</p>
+				<p><strong>Q2 :</strong> Explain how to go from data to CRF train and test data (give the comands and explain the results).</p>
+				<p><strong>Q3 :</strong> Give details about the amount of train and test data available for your experiments.</p>
+				 
+			<p></p>
+			</ol>
+	<h3>II. Training the CRF</h3>
+	<ol>
+		<p>
+        The main idea is to train your model using the data you processed.
+		</p> 
+		 
+		<ol>
+			<p><strong>Exercice 1:</strong> Set up the training</p>
+			<ol>
+				<p><strong>Q1 : </strong> What kind of additionnal file do you need to launch your training data?</p>
+                <p></p>
+				<p><strong>Q2 : </strong> Explain the file format, what and what for.</p>		 
+			</ol>
+			<p><strong>Exercice 2 :</strong> Launch training.</p>
+			<ol>
+				<p><strong>Q1 : </strong> Launch the training, what is your command line? Explain it.</p>
+                <p></p>
+				<p><strong>Q2 : </strong> What is the output of the training? How long did it took?</p>		 
+			</ol>
+		</ol>
+	</ol>
+	<h3>III. Evaluation</h3>
+	<ol>
+		<p> Now you have your CRF model, you will evaluate it using </p>
+		<p><em>Remark: </em> You will use the same previous script eval.py to evaluate your results.</p>
+		<ol>
+			<p><strong>Exercice 1 :</strong> Evaluation of the test set</p>
+			<ol>
+				<p><strong>Q1 : </strong> Give the necessary commands to launch the evaluation of the model on the test set.</p>
+				<p><strong>Q2 : </strong> Give the score and explain them.</p>
+			</ol>
+			<p><strong>Exercice 2 :</strong> Data Analysis </p>
+			<ol>
+				<p><strong>Q1 : </strong> Compare your results with the FST output, what are the improvements? Feel free to give statistics about it.</p>
+				<p><strong>Q2 : </strong> Give example of improvement observed why are they representatives.</p>
+                <p></p>
+			</ol>
+		</ol>
+	</ol>
+</ol>
+ <br> <br>The End.
+
+</body></html>
