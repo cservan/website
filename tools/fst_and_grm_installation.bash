@@ -22,6 +22,6 @@ pushd $TMP
 	popd
 	echo "export PATH=\$PATH:$DESTINATION/openfst-1.5.0/bin/:$DESTINATION/opengrm-1.2.1/bin" >> ~/.bashrc
 popd
-. ~/.bashrc
+source ~/.bashrc
 
 
