@@ -3,8 +3,10 @@ TMP=$HOME/Tools/Sources
 
 mkdir -pv $TMP
 pushd $TMP
-	wget http://www-clips.imag.fr/geod/User/christophe.servan/tools/openfst-1.5.0.tar.gz
-	wget http://www-clips.imag.fr/geod/User/christophe.servan/tools/opengrm-ngram-1.2.1.tar.gz	
+	wget https://cservan.github.io/website/tools/openfst-1.5.0.tar.gz
+	wget https://cservan.github.io/website/tools/opengrm-ngram-1.2.1.tar.gz	
+#	wget http://www-clips.imag.fr/geod/User/christophe.servan/tools/openfst-1.5.0.tar.gz
+#	wget http://www-clips.imag.fr/geod/User/christophe.servan/tools/opengrm-ngram-1.2.1.tar.gz	
 	tar xvfz openfst-1.5.0.tar.gz
 	tar xvfz opengrm-ngram-1.2.1.tar.gz
 	pushd openfst-1.5.0 
