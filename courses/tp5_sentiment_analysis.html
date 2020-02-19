@@ -19,10 +19,10 @@ An expression of subjectivity such as reference to first person pronouns or
 possessives
 </li>
 <li>
-The use of sentiment words such as \like", \best", \boring", \hated"...
+The use of sentiment words such as "like", "best", "boring", "hated"...
 </li>
 <li>
-The modulation of these aspects by markers such as \hardly", \not"
+The modulation of these aspects by markers such as "hardly", "not"
 </li>
 </ul>
 Therefore, typical sentiment analysis systems rely on word lists for capturing subjectivity and sentiment bearing words, and word n-grams or parse trees for
@@ -34,7 +34,7 @@ Tweets have a few specificities that make the sentiment analysis task more
 challenging. They contain very informal language with a lot of typos and colloquial language. 
 Smileys can be an extra source of information but they are highly variable. 
 Hashtags and user names are marked (along with other Twitter specific abbreviations). 
-Word morphology can be modified to express sentiment (such as \loooooooool"). 
+Word morphology can be modified to express sentiment (such as "loooooooool"). 
 Therefore, formal linguistic analysis such as parsing and word lists are unlikely to be very helpful, but deep learning approaches can help dealing with that variability.
 
 	<h2>Data</h2>
@@ -106,7 +106,7 @@ tokenizer.fit_on_texts(texts)
 sequences = tokenizer.texts_to_sequences(texts)
 data = pad_sequences(sequences, maxlen=32)
 vocab = tokenizer.word_index
-vocab['<eos>'] = 0                
+vocab['&lt;eos&gt;'] = 0                
 </pre>
                 </p>
 				<p><strong>Q2:</strong> Now you should have two numpy arrays which shape are (5513, 32) and (5513, 4) for tweets and labels respectively.</p>
