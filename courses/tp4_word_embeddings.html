@@ -6,54 +6,25 @@
 <link href="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.css" rel="stylesheet" type="text/css"><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mutationObserver.js"></script><script src="chrome-extension://lnkdbjbjpnpjeciipoaflmpcddinpjjp/mytube.js"></script></head>
 <body lang="fr-FR" text="#000000" dir="ltr" style="background: transparent">
 <h1 align="center">Demo 4: Deep Learning for NLP - Word Embeddings</h1>
-<h3 align="center">Christophe Servan</br> Courtesy of Benoît Fabre (LIS)
+<h3 align="center">Christophe Servan 
 </h3>
 	<hr>
-In this Demo, you will build a sentiment analysis system for Twitter. 
-The task consists in predicting whether a tweet is positive, negative or neutral regarding its content.
-Typically, sentiment polarity is conveyed by a combination of factors:
-<ul>
-<li>
-An expression of subjectivity such as reference to first person pronouns or
-possessives
-</li>
-<li>
-The use of sentiment words such as \like", \best", \boring", \hated"...
-</li>
-<li>
-The modulation of these aspects by markers such as \hardly", \not"
-</li>
-</ul>
-Therefore, typical sentiment analysis systems rely on word lists for capturing
-subjectivity and sentiment bearing words, and word n-grams or parse trees for
-capturing modulation eects.
-Since the quantity of data available for training is rather scarce, a num-
-ber of approaches can be applied for making a system that generalizes well.
-For instance, words can be replaced by part-of-speech tags, or word classes.
-Sentiment-bearing word-lists can be extended through collocation statistics.
-Tweets have a few specicities that make the sentiment analysis task more
-challenging. They contain very informal language with a lot of typos and col-
-loquial language. Smileys can be an extra source of information but they are
-highly variable. Hashtags and user names are marked (along with other Twitter
-specic abbreviations). Word morphology can be modied to express sentiment
-(such as \loooooooool"). Therefore, formal linguistic analysis such as parsing
-and word lists are unlikely to be very helpful, but deep learning approaches can
-help dealing with that variability.
-
 	<h2>Tools</h2>
 	<ul>
-		<li>Glove: like FastText it is used to train your Word Embeddings. 
+		<li>FastText: enable you to train and use word embeddings. 
 		
 		</li><li>Installation:
 			<ul>
-				<li>No specific installation is require here, we will use Python3 with Keras.
+				<li>Download the installation script <tt><a href="https://cservan.github.io/website/tools/FT_installation.bash">FT_installation.bash</a></tt> then type:<pre>bash FT_installation.bash</pre><b>WARNING: </b> the tool will be installed by default into the "tools" directory located into your home directory. <br> <br>
+				</li><li>Once the installation is done, type <pre>source ~/.bashrc</pre>
+				</li><li>Test your installation by typing <pre>fasttext --help</pre> the result should print the help of the fasttext command.
 			</li></ul>
 	</li></ul>
 	<h2>Data</h2>
 	
 	<ul>
-		<li>Use the data file (download <a href="https://cservan.github.io/website/tools/tp_sentiment_analysis.tar.gz">here</a>).
-		</li><li>Decompress then using unzip:<pre>tar xvfz tp_sentiment_analysis.tar.gz </pre> 
+		<li>Use the text8 data file (download <a href="https://cservan.github.io/website/tools/text8.zip">here</a>) to train our word embeddings.
+		</li><li>Decompress then using unzip:<pre>unzip -x text8.zip </pre> 
 	</li></ul>
 	<hr>
 	<h2>Report
@@ -76,14 +47,29 @@ help dealing with that variability.
 		<ol>
 			This TP is here to help you manipulate the word embeddings
 			<ul>
-				<li>Fristly you will use word embeddings
+				<li>Fristly you will train your word embeddings
 				</li><li>First task is to load the them
 				</li><li>Then find the closest words
 				</li><li>In a fourth part, you will process analogy
 				</li><li>Finally, Evaluate the embeddings according a well known dataset
 			</li></ul>
 	</ol>
-	<h3>I. Using word embeddings</h3>
+	<h3>I. Train word embeddings</h3>
+	<ol>
+		<p>The main idea is to train your first word embeddings model</p>
+		
+		<p><b>WARNING:</b> Read carefully the documentation available here: <a href="https://github.com/facebookresearch/fastText">https://github.com/facebookresearch/fastText</a></p>
+		<ol>
+			<p><strong>Exercice 1:</strong> Train two models, with a vector dimension of 50, 5iteration of training and a window size of 15.
+			</p><ol>
+				<p><strong>Q1:</strong> Train a cbow model, explain your command line</p>
+				<p><strong>Q2:</strong> Train a skip-gram model, explain your command line</p>
+				<p><strong>Q3:</strong> Give example of the vector file, describe it</p>
+				 </ol>
+			<p></p>
+        </ol>
+	</ol>
+	<h3>II. Loading word embeddings</h3>
 	<ol>
 		<p>
         Loading the WE is not difficult in itself. 
