@@ -142,9 +142,9 @@ Train data and validataion data are required for machine translation training. â
 <li>tgt-train, tgt-val => Need to apply tgt.code </li>
 <li>command lines:</br>
 
-<tt>cat EMEA_train.fr ep7_train.fr &gt; train.fr </tt></br>
+<tt>cat EMEA_train.fr ep7_train.fr &gt; train.fr </tt></br> #contatenate the training data
 <tt>cat EMEA_train.en ep7_train.en &gt; train.en </tt></br>
-<tt>mkdir -pv my_model_directory </tt></br>
+<tt>mkdir -pv my_model_directory </tt></br>  #create the model directory in which all data and model will be stored
 <tt>subword-nmt learn-bpe  -s 16000 &lt; train.fr &gt; my_model_directory/fr.code </tt></br>
 <tt>subword-nmt learn-bpe  -s 16000 &lt; train.en &gt; my_model_directory/en.code </tt></br>
 <tt>subword-nmt apply-bpe -c  fr.code &lt; train.fr &gt; my_model_directory/train.fr.bpe</tt></br>
@@ -160,7 +160,7 @@ Train data and validataion data are required for machine translation training. â
 </li>
 </ul>
 <h4>Build Vocab</h4>
-
+These commands will create two vocabulary files to process data.
 <tt>onmt-build-vocab --size 50000 --save_vocab my_model_directory/vocab.fr my_model_directory/train.fr.bpe</tt></br>
 
 <tt>onmt-build-vocab --size 50000 --save_vocab my_model_directory/vocab.en my_model_directory/train.en.bpe</tt></br>
@@ -208,7 +208,7 @@ infer:
 Even after the translation process is finished, it is still in a segment, so it is different from the actual sentence structure used by real people. Thus, when you perform a detoxification process, it is returned in the form of the actual sentence.</p>
 <p> We Use "sed" for BPE Detokenization</p>
 <pre>
-cat my_model_directory/ep7_hyp.en.bpe | sed "s/@@ //g" > my_model_directory/ep7_hyp.en
+cat my_model_directory/ep7_hyp.en.bpe | sed "s/@@ //g" &gt; my_model_directory/ep7_hyp.en
 </pre>
 
 <h3>VI. Evaluation Using BLEU</h3>
@@ -217,7 +217,7 @@ Quantitative evaluation is performed on the sentence thus obtained. BLEU is a qu
 </p>
 <a href=https://www.aclweb.org/anthology/P02-1040>https://www.aclweb.org/anthology/P02-1040</a>
 <pre>
-perl  OpenNMT-tf/third_party/multi-bleu.perl my_model_directory/ep7_tst.en < my_model_directory/ep7_hyp.en
+perl  OpenNMT-tf/third_party/multi-bleu.perl my_model_directory/ep7_tst.en &lt; my_model_directory/ep7_hyp.en
 </pre>
 </ol>
 
