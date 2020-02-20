@@ -29,14 +29,10 @@ Feel free to manually check the result of each step and ask questions if there i
 
 <ul>
   <li>OpenNMT: <pre> 
-  git clone https://github.com/OpenNMT/OpenNMT-tf.git 
-  or
-  pip install OpenNMT-tf[tensorflow_gpu]
+  python3 -m pip install OpenNMT-tf
   </pre></li>
   <li>OpenNMT: <pre> 
-  git clone https://github.com/rsennrich/subword-nmt
-  or
-  pip install subword-nmt
+  python3 -m pip install subword-nmt
   </pre></li>
 </ul>
 
@@ -125,8 +121,10 @@ Quantitative evaluation is performed on the sentence thus obtained. BLEU is a qu
 
 <p>We will be working with some example data in <tt>my_model_directory/</tt> folder. ​ The data consists of parallel source (src) and target (tgt) data containing one sentence per line with tokens separated by a space: ​
 <ul>
-    <li>train.fr</li>
-    <li>train.en</li>
+    <li>EMEA_train.fr</li>
+    <li>EMEA_train.en</li>
+    <li>ep7_train.fr</li>
+    <li>ep7_train.en</li>
     <li>ep7_dev.fr</li>
     <li>ep7_dev.en</li>
 </ul>
@@ -138,24 +136,27 @@ Train data and validataion data are required for machine translation training. �
 <li>i => input</li>
 <li>o => Output(*.code)</li>
 <li>s => Symbol (Usually use 32000 but we will use a lower value: 16k to speed up the training)</li>
-<li>learn_bpe ==> make code</li>
-<li>apply_bpe ==> apply subwordTokenization</li>
+<li>learn-bpe ==> make code</li>
+<li>apply-bpe ==> apply subwordTokenization</li>
 <li>src-train, src-val,test => Need to apply src.code</li>
 <li>tgt-train, tgt-val => Need to apply tgt.code </li>
 <li>command lines:</br>
 
-<tt>subword-nmt learn-bpe  -s 16000 &lt; train.fr &gt; fr.code </tt></br>
-<tt>subword-nmt learn-bpe  -s 16000 &lt; train.en &gt; en.code </tt></br>
-<tt>subword-nmt apply-bpe -c  fr.code &lt; train.fr &gt; train.fr.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  en.code  &lt; train.en &gt; train.en.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  fr.code &lt; EMEA_dev.fr &gt; EMEA_dev.fr.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  en.code  &lt; EMEA_dev.en &gt; EMEA_dev.en.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  fr.code &lt; ep7_dev.fr &gt; ep7_dev.fr.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  en.code  &lt; ep7_dev.en &gt; ep7_dev.en.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  fr.code &lt; EMEA_tst.fr &gt; EMEA_tst.fr.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  en.code  &lt; EMEA_tst.en &gt; EMEA_tst.en.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  fr.code &lt; ep7_tst.fr &gt; ep7_tst.fr.bpe</tt></br>
-<tt>subword-nmt apply-bpe -c  en.code  &lt; ep7_tst.en &gt; ep7_tst.en.bpe</tt></br>
+<tt>cat EMEA_train.fr ep7_train.fr &gt; train.fr </tt></br>
+<tt>cat EMEA_train.en ep7_train.en &gt; train.en </tt></br>
+<tt>mkdir -pv my_model_directory </tt></br>
+<tt>subword-nmt learn-bpe  -s 16000 &lt; train.fr &gt; my_model_directory/fr.code </tt></br>
+<tt>subword-nmt learn-bpe  -s 16000 &lt; train.en &gt; my_model_directory/en.code </tt></br>
+<tt>subword-nmt apply-bpe -c  fr.code &lt; train.fr &gt; my_model_directory/train.fr.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  en.code  &lt; train.en &gt; my_model_directory/train.en.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  fr.code &lt; EMEA_dev.fr &gt; my_model_directory/EMEA_dev.fr.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  en.code  &lt; EMEA_dev.en &gt; my_model_directory/EMEA_dev.en.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  fr.code &lt; ep7_dev.fr &gt; my_model_directory/ep7_dev.fr.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  en.code  &lt; ep7_dev.en &gt; my_model_directory/ep7_dev.en.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  fr.code &lt; EMEA_tst.fr &gt; my_model_directory/EMEA_tst.fr.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  en.code  &lt; EMEA_tst.en &gt; my_model_directory/EMEA_tst.en.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  fr.code &lt; ep7_tst.fr &gt; my_model_directory/ep7_tst.fr.bpe</tt></br>
+<tt>subword-nmt apply-bpe -c  en.code  &lt; ep7_tst.en &gt; my_model_directory/ep7_tst.en.bpe</tt></br>
 </li>
 </ul>
 <h4>Build Vocab</h4>
@@ -174,8 +175,8 @@ data:
   train_labels_file: my_model_directory/train.en.bpe
   eval_features_file: my_model_directory/ep7_dev.fr.bpe
   eval_labels_file: my_model_directory/ep7_dev.en.bpe
-  source_words_vocabulary: my_model_directory/vocab.fr
-  target_words_vocabulary: my_model_directory/vocab.en
+  source_vocabulary: my_model_directory/vocab.fr
+  target_vocabulary: my_model_directory/vocab.en
 
 train:
   batch_size: 1024
