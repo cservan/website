@@ -49,13 +49,15 @@ Therefore, formal linguistic analysis such as parsing and word lists are unlikel
 	<p>You should send me your report <u><b>the day before the next session</b></u> using <b>PDF</b> format
 	at the address christophe_dot_servan_at_epita_dot_fr (replace
 	_dot_ and _at_ by dots and at, respectively) </p><p>
-	<em>Remarks:</em>
+	<b><em>Important remarks:</em></b>
 	</p><ul>
 		<li>If you encounter some issues, feel free to send me an email, I'll answer you ASAP;
+		</li><li>jupyternotes and others will be ignored. I want you to write a report, not a script. This also means you have to put your name on it and to do an effort of presentation! 
+		</li><li>The report mark is important for the final course mark ;
+		</li><li>You have to report working in groups, if you did so (ask me before) ;
+		</li><li>Plagianism = mark divide by two ;
 		</li><li>If you send me your report lately, you will be penalised ;
-		</li><li>the report mark is important for the final course mark ;
-		</li><li>jupyternotes and others will be ignored. I want you to write a report, not a script.
-		</li><li>no report equal to zero  ;
+		</li><li>No report equal to zero  ;
 	</li></ul>
 	<p></p>
 	<hr>
@@ -80,8 +82,8 @@ Therefore, formal linguistic analysis such as parsing and word lists are unlikel
 		<ol>
 			<p><strong>Exercice 1:</strong> Load and process data.
 			</p><ol>
-				<p><strong>Q1:</strong> Load the CSV file using the <tt>csv</tt> import in python.</p>
-				<p><strong>Q2:</strong> Produce a python list of pre-processed tweets using the script <tt>preprocess_twitter.py</tt></p>
+				<p><strong>Q1:</strong> Load the CSV file using the <tt>csv</tt> import in python. (1pt)</p>
+				<p><strong>Q2:</strong> Produce a python list of pre-processed tweets using the script <tt>preprocess_twitter.py</tt> (1pt)</p>
 				 </ol>
 			<p></p>
 			<p><strong>Exercice 1:</strong> Vectorize data.</p>
@@ -96,7 +98,7 @@ maxlen parameter) with the pad_sequences function. It returns a matrix of
 shape (number of examples, max length) which contains integers (word ids).
 The word mapping can be found in <tt>tokenizer.word_index</tt>.</p>
 			<ol>
-				<p><strong>Q1:</strong> Use these python lines to process data and labels:
+				<p><strong>Q1:</strong> Use these python lines to process data and labels: (1pt)
 <pre>
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -109,7 +111,7 @@ vocab = tokenizer.word_index
 vocab['&lt;eos&gt;'] = 0                
 </pre>
                 </p>
-				<p><strong>Q2:</strong> Now you should have two numpy arrays which shape are (5513, 32) and (5513, 4) for tweets and labels respectively.</p>
+				<p><strong>Q2:</strong> Now you should have two numpy arrays which shape are (5513, 32) and (5513, 4) for tweets and labels respectively. (1pt)</p>
                 <p> Now cut this coprus in two parts one for the training and one for the evaluation. The training set (x_train and y_train) should contains 4000 utterances and the validation set (x_val, y_val) should have the rest of the data. Feel free to shuffle data.</p>
 				 </ol>
 			<p></p>
@@ -149,11 +151,11 @@ model.compile(loss='categorical_crossentropy',optimizer='Nadam', metrics=['acc']
 model.fit(x_train, y_train, validation_data=(x_val, y_val),nb_epoch=10, batch_size=64, shuffle=True)            
 </pre>
 			<ol>
-				<p><strong>Q1: </strong> write in Python the necessary script train the model</p>
+				<p><strong>Q1: </strong> write in Python the necessary script train the model (3pt)</p>
                 <p></p>
-				<p><strong>Q2: </strong> evaluate the model using precision, recall, F1-measure, and accuracy metrics.</p>		 
+				<p><strong>Q2: </strong> evaluate the model using precision, recall, F1-measure, and accuracy metrics. (4pt)</p>		 
                 <p></p>
-				<p><strong>Q3: </strong> How many epochs are needed to reach at least 80% of accuracy?</p>
+				<p><strong>Q3: </strong> How many epochs are needed to reach at least 80% of accuracy? (2pt)</p>
 			</ol>
 		</ol>
 		<ol>
@@ -191,11 +193,11 @@ performance.
 It might be a good idea to extend that model with a regularization technique, such as for instance dropout.
 </p>
 			<ol>
-				<p><strong>Q1: </strong> write in Python the necessary script train the model</p>
+				<p><strong>Q1: </strong> write in Python the necessary script train the model (3pts)</p>
                 <p></p>
-				<p><strong>Q2: </strong> evaluate the model using precision, recall, F1-measure, and accuracy metrics.</p>		 
+				<p><strong>Q2: </strong> evaluate the model using precision, recall, F1-measure, and accuracy metrics. (4pts)</p>		 
                 <p></p>
-				<p><strong>Q3: (optional)</strong> Add a regularization method to the code and observe the results.</p>
+				<p><strong>Q3: (optional)</strong> Add a regularization method to the code and observe the results. (3pts)</p>
 			</ol>
 		</ol>
 	</ol>
